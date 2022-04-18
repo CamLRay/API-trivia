@@ -34,7 +34,15 @@ $(document).ready(function() {
     event.preventDefault();
     const category = $("#category").val();
     const difficulty = $("#difficulty").val();
-    let url =`https://opentdb.com/api.php?amount=1&category=${category}&difficulty=${difficulty}&token=${sessionToken}`;
+
+    let url;
+    if (difficulty === "any") {
+      url =`https://opentdb.com/api.php?amount=1&category=${category}&token=${sessionToken}`;
+    } else {
+      url =`https://opentdb.com/api.php?amount=1&category=${category}&difficulty=${difficulty}&token=${sessionToken}`;
+    }
+
+    
 
     httpRequest(url, function() {
       if(this.readyState === 4 && this.status === 200) {
@@ -60,11 +68,18 @@ function displayCategories(categories) {
 
 function displayQuestion(question, correctAnswer) {
   let answers = shuffleAnswers(question["incorrect_answers"].concat(question["correct_answer"]));
-  let questionCard = `<div class='card'><h5 class='card-title'>${question.question}</h5><ul class='list-group list-group-flush'></ul></div>`;
+
+  let questionCard = `<div class='card'><h5 class='card-title ${question.difficulty}'>${question.question}`
+  if ($("#color").is(":checked")) {
+    questionCard += `(${question.difficulty})`;
+  }
+  questionCard += `</h5><ul class='list-group list-group-flush'></ul></div>`;
+
   $("#output").html(questionCard);
 
   let answerOutput = $("ul");
   answerOutput.on("click", function() {
+    $(this).off("click");
     let total = parseInt($("#total").text());
     $("#total").text(++total);
     let answerTags = $("li");
@@ -73,8 +88,14 @@ function displayQuestion(question, correctAnswer) {
       let answerTag = answerTags[i];
       if(answerTag.textContent === correctAnswer) {
         answerTag.classList.add("right");
+        if ($("#color").is(":checked")) {
+          answerTag.textContent += " (Correct!)";
+        }
       } else {
         answerTag.classList.add("wrong");
+        if ($("#color").is(":checked")) {
+          answerTag.textContent += " (Incorrect)";
+        }
       }
     }
   });
@@ -85,6 +106,8 @@ function displayQuestion(question, correctAnswer) {
         let score = parseInt($("#score").text());
         $("#score").text(++score);
       }
+
+      $(this).addClass("selected");
     });
 
     answerOutput.append(answerTag);

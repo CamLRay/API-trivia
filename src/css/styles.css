@@ -9,8 +9,24 @@
   background-color: rgb(240, 240, 240);
 }
 
+.selected {
+  border: 3px solid black !important;
+}
+
+.easy {
+  background-color: rgb(255, 225, 230);
+}
+
+.medium {
+  background-color: rgb(255, 197, 91);
+}
+
+.hard {
+  background-color: rgb(178, 129, 201);
+}
+
 .wrong {
-  background-color: rgba(170, 25, 25, 0.61);
+  background-color: rgba(172, 34, 34, 0.61);
 }
 
 .right {
