@@ -1,6 +1,12 @@
+body {
+  width: 80%;
+  margin: auto;
+}
+
 .card {
   width: 80%;
   margin: auto;
+  margin-top: 2em;
 }
 
 .card-title {
@@ -31,4 +37,8 @@
 
 .right {
   background-color: rgba(27, 177, 27, 0.555);
+}
+
+.hidden {
+  display: none;
 }

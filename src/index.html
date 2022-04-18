@@ -4,19 +4,33 @@
   <title>Trivia game</title>
 </head>
 <body>
-  <h3>Select a category and difficulty</h3>
-  <input type="checkbox" id="color">
-  <label for="color">Colorblind Friendly</label>
-  <form>
-    <select id="difficulty">
-      <option>any</option>
-      <option>easy</option>
-      <option>medium</option>
-      <option>hard</option>
-    </select>
-    <button type="submit" class="btn btn-primary">submit</button>
-  </form>
-  <div>Score: <span id="score">0</span> / <span id="total">0</span></div>
-  <div id="output"></div>
+  <h1 class="display-1 text-center">Trivia!</h1>
+  <div id="player-select">
+    <form id="player">
+      <label>Enter player name:</label>
+      <input type="text" id="name">
+      <button type="submit" id="add-player" class="btn btn-primary">Add</button>
+    </form>
+    <div id="players">
+      <ul></ul>
+    </div>
+    <button id="start" class="btn btn-success">Play!</button>
+  </div>
+  <div id="game" class="hidden">
+    <h3>Select a category and difficulty</h3>
+    <input type="checkbox" id="color">
+    <label for="color">Vision Deficiency Friendly</label>
+    <form id="game-form">
+      <select id="difficulty">
+        <option>any</option>
+        <option>easy</option>
+        <option>medium</option>
+        <option>hard</option>
+      </select>
+      <button type="submit" class="btn btn-primary">submit</button>
+    </form>
+    <div><span id="player-name"></span>'s Score: <span id="score">0</span> / <span id="total">0</span></div>
+    <div id="output"></div>
+  </div>
 </body>
 </html>

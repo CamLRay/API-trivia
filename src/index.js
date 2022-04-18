@@ -2,7 +2,10 @@ import $ from 'jquery';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/styles.css';
+import Player from "./js/trivia";
+
 let sessionToken = "";
+let players = [];
 
 function httpRequest(url, stateChangeFunction) {
   let request = new XMLHttpRequest();
@@ -22,6 +25,7 @@ const sessionTokenGenerator = () => {
 };
 
 $(document).ready(function() {
+  let started = false;
   sessionTokenGenerator();
   httpRequest(`https://opentdb.com/api_category.php`, function() {
     if(this.readyState === 4 && this.status === 200) {
@@ -30,7 +34,22 @@ $(document).ready(function() {
     }
   });
 
-  $("form").submit(function(event){
+  $("#player").submit(function(event) {
+    event.preventDefault();
+    const name = $("#name").val();
+    players.push(new Player(name));
+
+    $("#players ul").append(`<li>${name}</li>`);
+  });
+
+  $("#start").on("click", function() {
+    $("#player-select").addClass("hidden");
+    $("#game").removeClass("hidden");
+
+    $("#player-name").text(players[0].name);
+  });
+
+  $("#game-form").submit(function(event){
     event.preventDefault();
     const category = $("#category").val();
     const difficulty = $("#difficulty").val();
@@ -42,7 +61,21 @@ $(document).ready(function() {
       url =`https://opentdb.com/api.php?amount=1&category=${category}&difficulty=${difficulty}&token=${sessionToken}`;
     }
 
-    
+    let currPlayerName = $("#player-name").text();
+    let nextPlayer;
+    if (getPlayer(currPlayerName) + 1 >= players.length) {
+      nextPlayer = players[0];
+    } else {
+      nextPlayer = players[getPlayer(currPlayerName) + 1];
+    }
+
+    if (!started) {
+      started = !started;
+    } else {
+      $("#player-name").text(nextPlayer.name);
+      $("#score").text(nextPlayer.score);
+      $("#total").text(nextPlayer.total);
+    }
 
     httpRequest(url, function() {
       if(this.readyState === 4 && this.status === 200) {
@@ -58,20 +91,30 @@ $(document).ready(function() {
   });
 });
 
+function getPlayer(name) {
+  for (let i = 0; i < players.length; i++) {
+    if (players[i].name === name) {
+      return i;
+    }
+  }
+
+  return -1;
+}
+
 function displayCategories(categories) {
   let dropDown = "<select id='category'>";
   categories.forEach(function(category){
     dropDown += `<option value=${category.id}>${category.name}</option>`;
   });
-  $("form").prepend(`${dropDown}</select>`);
+  $("#game-form").prepend(`${dropDown}</select>`);
 }
 
 function displayQuestion(question, correctAnswer) {
   let answers = shuffleAnswers(question["incorrect_answers"].concat(question["correct_answer"]));
 
-  let questionCard = `<div class='card'><h5 class='card-title ${question.difficulty}'>${question.question}`
+  let questionCard = `<div class='card'><h5 class='card-title ${question.difficulty}'>${question.question}`;
   if ($("#color").is(":checked")) {
-    questionCard += `(${question.difficulty})`;
+    questionCard += ` (${question.difficulty})`;
   }
   questionCard += `</h5><ul class='list-group list-group-flush'></ul></div>`;
 
@@ -80,8 +123,11 @@ function displayQuestion(question, correctAnswer) {
   let answerOutput = $("ul");
   answerOutput.on("click", function() {
     $(this).off("click");
-    let total = parseInt($("#total").text());
-    $("#total").text(++total);
+
+    let player = players[getPlayer($("#player-name").text())];
+    player.total += 1;
+    $("#total").text(player.total);
+
     let answerTags = $("li");
     answerTags.off("click");
     for (let i = 0; i < answerTags.length; i++) {
@@ -103,8 +149,9 @@ function displayQuestion(question, correctAnswer) {
     let answerTag = $(`<li class='list-group-item'>${answer}</li>`);
     answerTag.on("click", function() {
       if ($(this).text() === correctAnswer) {
-        let score = parseInt($("#score").text());
-        $("#score").text(++score);
+        let player = players[getPlayer($("#player-name").text())];
+        player.score += 1;
+        $("#score").text(player.score);
       }
 
       $(this).addClass("selected");
