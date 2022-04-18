@@ -4,6 +4,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/styles.css';
 let sessionToken = "";
 
+function 
+
 const sessionTokenGenerator = () => {
   let sessionRequest = new XMLHttpRequest();
   const url = `https://opentdb.com/api_token.php?command=request`;
@@ -70,6 +72,7 @@ function displayQuestion(question, correctAnswer) {
 
   let answerOutput = $("ul");
   answerOutput.on("click", function() {
+    let total = parseInt($("#total").text());
     $("#total").text(++total);
     let answerTags = $("li");
     answerTags.off("click");

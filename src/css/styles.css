@@ -1,0 +1,18 @@
+.card {
+  width: 80%;
+  margin: auto;
+}
+
+.card-title {
+  padding: 1em;
+  margin: 0;
+  background-color: rgb(240, 240, 240);
+}
+
+.wrong {
+  background-color: rgba(170, 25, 25, 0.61);
+}
+
+.right {
+  background-color: rgba(27, 177, 27, 0.555);
+}
