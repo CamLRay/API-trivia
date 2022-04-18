@@ -4,56 +4,49 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/styles.css';
 let sessionToken = "";
 
-function 
+function httpRequest(url, stateChangeFunction) {
+  let request = new XMLHttpRequest();
+  request.onreadystatechange = stateChangeFunction;
+  request.open("GET", url, true);
+  request.send();
+}
 
 const sessionTokenGenerator = () => {
-  let sessionRequest = new XMLHttpRequest();
   const url = `https://opentdb.com/api_token.php?command=request`;
-  sessionRequest.onreadystatechange = function() {
+  httpRequest(url, function() {
     if (this.readyState === 4 && this.status === 200) {
       sessionToken = JSON.parse(this.responseText);
       sessionToken = sessionToken.token;
     }
-  };
-  sessionRequest.open("GET", url, true);
-  sessionRequest.send();
+  });
 };
 
 $(document).ready(function() {
   sessionTokenGenerator();
-  let categoryRequest = new XMLHttpRequest();
-  const url = `https://opentdb.com/api_category.php`;
-  categoryRequest.onreadystatechange = function () {
+  httpRequest(`https://opentdb.com/api_category.php`, function() {
     if(this.readyState === 4 && this.status === 200) {
       const categories = JSON.parse(this.responseText);
       displayCategories(categories["trivia_categories"]);
     }
-  };
-  categoryRequest.open("GET", url, true);
-  categoryRequest.send();
+  });
 
   $("form").submit(function(event){
     event.preventDefault();
     const category = $("#category").val();
     const difficulty = $("#difficulty").val();
-    let questionRequest = new XMLHttpRequest();
     let url =`https://opentdb.com/api.php?amount=1&category=${category}&difficulty=${difficulty}&token=${sessionToken}`;
-    questionRequest.onreadystatechange = function () {
+
+    httpRequest(url, function() {
       if(this.readyState === 4 && this.status === 200) {
         const question = JSON.parse(this.responseText);
         if (question["response_code"] === 4) {
-          let refreshRequest = new XMLHttpRequest();
           let refreshURL = `https://opentdb.com/api_token.php?command=reset&token=${sessionToken}`;
-          
-          refreshRequest.open("GET", refreshURL, true);
-          refreshRequest.send();
+          httpRequest(refreshURL);
         } else {
           displayQuestion(question.results[0], decodeHTMLCharCodes(question.results[0]["correct_answer"]));
         }
       }
-    };
-    questionRequest.open("GET", url, true);
-    questionRequest.send();
+    });
   });
 });
 
